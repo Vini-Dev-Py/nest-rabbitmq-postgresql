@@ -8,6 +8,6 @@ import { RabbitMQService } from './rabbitmq.service';
 @Module({
   imports: [CassandraModule],
   providers: [RabbitMQService, LogConsumer, LogProducer, CreateLogUseCase],
-  exports: [RabbitMQService, LogProducer],
+  exports: [RabbitMQService, LogProducer, CreateLogUseCase],
 })
 export class RabbitMQModule {}

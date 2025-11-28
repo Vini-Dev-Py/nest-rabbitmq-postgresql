@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateLogUseCase } from '../../../application/use-cases/create-log.use-case';
 import { CreateLogDto } from '../../../application/dtos/create-log.dto';
 import { RabbitMQService } from './rabbitmq.service';
@@ -9,6 +9,8 @@ export const LOG_ROUTING_KEY = 'log.create';
 
 @Injectable()
 export class LogConsumer implements OnModuleInit {
+  private readonly logger = new Logger(LogConsumer.name);
+
   constructor(
     private readonly rabbitMQService: RabbitMQService,
     private readonly createLogUseCase: CreateLogUseCase,
@@ -43,7 +45,7 @@ export class LogConsumer implements OnModuleInit {
           await this.createLogUseCase.execute(content);
           this.rabbitMQService.ack(message);
         } catch (error) {
-          console.error('Error processing log message:', error);
+          this.logger.error('Error processing log message:', error);
           this.rabbitMQService.nack(message, false);
         }
       };

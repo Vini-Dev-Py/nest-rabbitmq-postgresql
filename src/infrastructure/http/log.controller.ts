@@ -7,6 +7,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { CreateLogDto, LogResponseDto } from '../../application/dtos';
 import {
@@ -32,7 +33,13 @@ export class LogController {
   @Post('async')
   @HttpCode(HttpStatus.ACCEPTED)
   createAsync(@Body() createLogDto: CreateLogDto): { message: string } {
-    this.logProducer.publishLog(createLogDto);
+    const success = this.logProducer.publishLog(createLogDto);
+    if (!success) {
+      throw new HttpException(
+        'Failed to publish log message to queue',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
+    }
     return { message: 'Log message sent to queue for processing' };
   }
 

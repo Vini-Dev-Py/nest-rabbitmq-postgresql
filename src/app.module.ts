@@ -5,7 +5,6 @@ import { AppService } from './app.service';
 import { CassandraModule } from './infrastructure/database/cassandra/cassandra.module';
 import { RabbitMQModule } from './infrastructure/messaging/rabbitmq/rabbitmq.module';
 import { LogController } from './infrastructure/http/log.controller';
-import { CreateLogUseCase } from './application/use-cases/create-log.use-case';
 import { GetLogsByDateUseCase } from './application/use-cases/get-logs-by-date.use-case';
 
 @Module({
@@ -18,6 +17,6 @@ import { GetLogsByDateUseCase } from './application/use-cases/get-logs-by-date.u
     RabbitMQModule,
   ],
   controllers: [AppController, LogController],
-  providers: [AppService, CreateLogUseCase, GetLogsByDateUseCase],
+  providers: [AppService, GetLogsByDateUseCase],
 })
 export class AppModule {}
