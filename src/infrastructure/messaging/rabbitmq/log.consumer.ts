@@ -1,6 +1,6 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { CreateLogUseCase } from '../../../application/use-cases/create-log.use-case';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { CreateLogDto } from '../../../application/dtos/create-log.dto';
+import { CreateLogUseCase } from '../../../application/use-cases/create-log.use-case';
 import { RabbitMQService } from './rabbitmq.service';
 
 export const LOG_QUEUE = 'logs_queue';
@@ -8,7 +8,7 @@ export const LOG_EXCHANGE = 'logs_exchange';
 export const LOG_ROUTING_KEY = 'log.create';
 
 @Injectable()
-export class LogConsumer implements OnModuleInit {
+export class LogConsumer implements OnApplicationBootstrap {
   private readonly logger = new Logger(LogConsumer.name);
 
   constructor(
@@ -16,7 +16,9 @@ export class LogConsumer implements OnModuleInit {
     private readonly createLogUseCase: CreateLogUseCase,
   ) {}
 
-  async onModuleInit(): Promise<void> {
+  async onApplicationBootstrap(): Promise<void> {
+    // Wait a bit to ensure RabbitMQ service is fully initialized
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await this.setupQueue();
     await this.startConsuming();
   }

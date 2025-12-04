@@ -1,3 +1,3 @@
-export * from './database/cassandra';
-export * from './messaging/rabbitmq';
+export * from './database/postgresql';
 export * from './http';
+export * from './messaging/rabbitmq';

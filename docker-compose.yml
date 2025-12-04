@@ -6,12 +6,14 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - CASSANDRA_CONTACT_POINTS=cassandra
-      - CASSANDRA_LOCAL_DATACENTER=datacenter1
-      - CASSANDRA_KEYSPACE=logs_keyspace
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=logs_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672
     depends_on:
-      cassandra:
+      postgres:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
@@ -19,22 +21,22 @@ services:
       - app-network
     restart: unless-stopped
 
-  cassandra:
-    image: cassandra:4.1
+  postgres:
+    image: postgres:16-alpine
     ports:
-      - '9042:9042'
+      - '5432:5432'
     environment:
-      - CASSANDRA_CLUSTER_NAME=LogsCluster
-      - CASSANDRA_DC=datacenter1
-      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - POSTGRES_DB=logs_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     volumes:
-      - cassandra-data:/var/lib/cassandra
+      - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'cqlsh -e "describe cluster"']
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - app-network
     restart: unless-stopped
@@ -64,5 +66,5 @@ networks:
     driver: bridge
 
 volumes:
-  cassandra-data:
+  postgres-data:
   rabbitmq-data:

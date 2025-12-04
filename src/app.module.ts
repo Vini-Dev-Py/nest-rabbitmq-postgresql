@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CassandraModule } from './infrastructure/database/cassandra/cassandra.module';
-import { RabbitMQModule } from './infrastructure/messaging/rabbitmq/rabbitmq.module';
-import { LogController } from './infrastructure/http/log.controller';
 import { GetLogsByDateUseCase } from './application/use-cases/get-logs-by-date.use-case';
+import { PostgresqlModule } from './infrastructure/database/postgresql/postgresql.module';
+import { LogController } from './infrastructure/http/log.controller';
+import { RabbitMQModule } from './infrastructure/messaging/rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { GetLogsByDateUseCase } from './application/use-cases/get-logs-by-date.u
       isGlobal: true,
       envFilePath: '.env',
     }),
-    CassandraModule,
+    PostgresqlModule,
     RabbitMQModule,
   ],
   controllers: [AppController, LogController],
