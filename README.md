@@ -25,8 +25,99 @@ src/
 - **Log Management**: Create and retrieve logs with different levels (DEBUG, INFO, WARN, ERROR)
 - **TypeORM Integration**: Automatic schema synchronization and type-safe queries
 - **Async Processing**: Logs can be sent asynchronously via RabbitMQ
+- **Horizontal Scaling**: Built-in support for multiple instances with Nginx load balancing
 - **Clean Architecture**: Clear separation between domain, application, and infrastructure layers
 - **Date-Based Queries**: Efficient log retrieval filtered by date and log level
+- **Health Checks**: Monitoring endpoints for database and messaging services
+
+## Horizontal Scaling
+
+The application is designed for horizontal scaling to handle high-traffic scenarios. It uses Nginx as a load balancer to distribute requests across multiple backend instances.
+
+### Architecture
+
+```
+                    Internet
+                       │
+                       ▼
+                ┌─────────────┐
+                │    Nginx    │
+                │   Port 80   │
+                └──────┬──────┘
+                       │ (Load Balancer)
+        ┌──────────────┼──────────────┐
+        │              │              │
+   ┌────▼────┐    ┌────▼────┐   ┌────▼────┐
+   │  App    │    │  App    │   │  App    │
+   │Instance │    │Instance │   │Instance │
+   │   #1    │    │   #2    │   │   #3    │
+   └────┬────┘    └────┬────┘   └────┬────┘
+        │              │              │
+        └──────────────┼──────────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        │              │              │
+   ┌────▼────┐    ┌────▼────┐    ┌────▼────┐
+   │PostgreSQL│    │RabbitMQ│    │  Logs   │
+   └──────────┘    └─────────┘    └─────────┘
+```
+
+### Default Configuration
+
+By default, the docker-compose configuration launches **3 app instances** behind Nginx:
+
+```bash
+docker compose up -d --build
+```
+
+Access the API through the load balancer: **http://localhost**
+
+### Custom Scaling
+
+You can scale the application to any number of instances:
+
+```bash
+# Scale to 5 instances
+docker compose up -d --scale app=5
+
+# Scale to 10 instances
+docker compose up -d --scale app=10
+```
+
+### Production Scaling
+
+For production environments, use the `docker-compose.scale.yml` override file with optimized resource limits:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.scale.yml up -d --build
+```
+
+This configuration:
+
+- Scales to 5 instances by default
+- Sets CPU and memory limits
+- Configures restart policies
+
+### Load Balancing Strategy
+
+- **Algorithm**: Least Connections (distributes to instance with fewest active connections)
+- **Health Checks**: Nginx monitors `/health` endpoint and removes unhealthy instances
+- **Fair Distribution**: RabbitMQ uses prefetch=1 for equal message distribution
+
+### Monitoring
+
+Check system health:
+
+```bash
+# Check load balancer health
+curl http://localhost/nginx-health
+
+# Check application health
+curl http://localhost/health
+
+# View logs from all instances
+docker compose logs app --follow
+```
 
 ## Prerequisites
 
@@ -46,14 +137,16 @@ docker compose up -d --build
 
 This will start:
 
-- The NestJS application on port 3000
+- Nginx Load Balancer on port 80
+- 3 NestJS application instances (internal, accessed through Nginx)
 - PostgreSQL on port 5432
 - RabbitMQ on ports 5672 (AMQP) and 15672 (Management UI)
 
 2. Access the services:
 
-- API: http://localhost:3000
-- RabbitMQ Management: http://localhost:15672 (guest/guest)
+- **API**: http://localhost (through Nginx load balancer)
+- **API Health Check**: http://localhost/health
+- **RabbitMQ Management**: http://localhost:15672 (guest/guest)
 
 ### Local Development
 

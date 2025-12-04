@@ -23,6 +23,10 @@ export class RabbitMQService implements OnModuleInit, OnModuleDestroy {
       try {
         this.connection = await amqp.connect(url);
         this.channel = await this.connection.createChannel();
+
+        // Set prefetch to 1 for fair distribution among multiple consumers
+        await this.channel.prefetch(1);
+
         console.log('RabbitMQ connected successfully');
         return;
       } catch (error) {

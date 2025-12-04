@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GetLogsByDateUseCase } from './application/use-cases/get-logs-by-date.use-case';
 import { PostgresqlModule } from './infrastructure/database/postgresql/postgresql.module';
+import { HealthController } from './infrastructure/http/health.controller';
 import { LogController } from './infrastructure/http/log.controller';
 import { RabbitMQModule } from './infrastructure/messaging/rabbitmq/rabbitmq.module';
 
@@ -16,7 +17,7 @@ import { RabbitMQModule } from './infrastructure/messaging/rabbitmq/rabbitmq.mod
     PostgresqlModule,
     RabbitMQModule,
   ],
-  controllers: [AppController, LogController],
+  controllers: [AppController, LogController, HealthController],
   providers: [AppService, GetLogsByDateUseCase],
 })
 export class AppModule {}
