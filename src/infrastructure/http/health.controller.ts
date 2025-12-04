@@ -1,5 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
+import * as os from 'os';
 import { DataSource } from 'typeorm';
 import { RabbitMQService } from '../messaging/rabbitmq/rabbitmq.service';
 
@@ -15,6 +16,7 @@ export class HealthController {
   async checkHealth(): Promise<{
     status: string;
     timestamp: string;
+    hostname: string;
     services: {
       database: string;
       rabbitmq: string;
@@ -47,6 +49,7 @@ export class HealthController {
     return {
       status: allHealthy ? 'healthy' : 'degraded',
       timestamp: new Date().toISOString(),
+      hostname: os.hostname(),
       services: checks,
     };
   }
