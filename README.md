@@ -57,8 +57,8 @@ The application is designed for horizontal scaling to handle high-traffic scenar
                        │
         ┌──────────────┼──────────────┐
         │              │              │
-   ┌────▼────┐    ┌────▼────┐    ┌────▼────┐
-   │PostgreSQL│    │RabbitMQ│    │  Logs   │
+   ┌────▼─────┐    ┌────▼────┐    ┌────▼────┐
+   │PostgreSQL│    │RabbitMQ │    │  Logs   │
    └──────────┘    └─────────┘    └─────────┘
 ```
 
