@@ -67,11 +67,11 @@ services:
       replicas: 3
       resources:
         limits:
-          cpus: '0.25'
-          memory: 256M
+          cpus: '0.8'
+          memory: 512M
         reservations:
-          cpus: '0.1'
-          memory: 128M
+          cpus: '0.2'
+          memory: 256M
 
   # PostgreSQL Database
   postgres:
@@ -96,8 +96,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '1.0'
+          memory: 1G
 
   # RabbitMQ Message Broker
   rabbitmq:
